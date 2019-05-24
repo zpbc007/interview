@@ -2,6 +2,10 @@
 
 与flex布局不同，grid布局可以控制二维空间，而flex布局只能控制一维的。
 
+## 参考
+
+- [css-tricks](https://css-tricks.com/snippets/css/complete-guide-grid/#prop-justify-items)
+
 ## 容器属性
 
 ##### dispaly
