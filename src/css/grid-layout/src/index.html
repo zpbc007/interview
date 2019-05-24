@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        .container {
+            display: grid;
+            grid-template-columns: 100px 80px auto 80px 100px;
+            grid-template-rows: 25% 100px auto;
+            height: 500px;
+        }
+        .container.border {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+        .container>.item {
+            background: yellowgreen;
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+    <body>
+        <div class="container border">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+            <div class="item">7</div>
+            <div class="item">8</div>
+            <div class="item">9</div>
+            <div class="item">10</div>
+            <div class="item">11</div>
+            <div class="item">12</div>
+            <div class="item">13</div>
+            <div class="item">14</div>
+            <div class="item">15</div>
+        </div>
+    </body>
+</html>
