@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .base {
+        width: 300px;
+        height: 200px;
+    }
+    .grid-bold {
+        background: white;
+        background-image: linear-gradient(90deg, rgba(200, 0, 0, 0.5) 50%, transparent 0),
+                          linear-gradient(rgba(200, 0, 0, 0.5) 50%, transparent 0);
+        background-size: 30px 30px;
+    }
+    .grid {
+        background: #58a;
+        background-image: linear-gradient(90deg, white 1px, transparent 0),
+                          linear-gradient(white 1px, transparent 0);
+        background-size: 30px 30px;
+    }
+    .grid-override {
+        background: #58a;
+        background-image: 
+            linear-gradient(white 2px, transparent 0),
+            linear-gradient(90deg, white 2px, transparent 0),
+            linear-gradient(hsla(0, 0%, 100%, .3) 1px, transparent 0),
+            linear-gradient(90deg, hsla(0, 0%, 100%, .3) 1px, transparent 0);
+        background-size: 75px 75px, 75px 75px,
+                         15px 15px, 15px 15px;
+    }
+    .point {
+        background: #655;
+        background-image: radial-gradient(tan 30%, transparent 0);
+        background-size: 30px 30px;
+    }
+    .point-two {
+        background: #655;
+        background-image: radial-gradient(tan 30%, transparent 0),
+                          radial-gradient(tan 30%, transparent 0);
+        background-size: 30px 30px;
+        background-position: 0 0, 15px 15px;
+    }
+    .triangle {
+        background: #eee;
+        background-image: linear-gradient(45deg, #bbb 25%, transparent 0);
+        background-size: 30px 30px;
+    }
+    .triangle-reverse {
+        background-image: linear-gradient(45deg, transparent 75%, #bbb 0);
+    }
+    .triangle-combine {
+        background-image: linear-gradient(45deg, #bbb 25%, transparent 0),
+            linear-gradient(45deg, transparent 75%, #bbb 0);
+    }
+    .triangle-override {
+        background-image: 
+            linear-gradient(45deg, #bbb 25%, transparent 0),
+            linear-gradient(45deg, transparent 75%, #bbb 0),
+            linear-gradient(45deg, #bbb 25%, transparent 0),
+            linear-gradient(45deg, transparent 75%, #bbb 0);
+        background-position: 0 0, 15px 15px, 15px 15px, 30px 30px;
+    }
+    .conic {
+        background: repeating-conic-gradient(#bbb 0, #bbb 25%, #eee 0, #eee 49%);
+        background-size: 30px 30px;
+    }
+</style>
+</header>
+<body>
+    <h1>网格 粗线</h1>
+    <div class="base grid-bold"></div>
+    <h1>网格 细线</h1>
+    <div class="base grid"></div>
+    <h1>网格 覆盖</h1>
+    <div class="base grid-override"></div>
+    <h1>波点</h1>
+    <div class="base point"></div>
+    <h1>波点-覆盖</h1>
+    <div class="base point-two"></div>
+    <h1>棋盘</h1>
+    <h2>第一步：创建三角形</h2>
+    <div class="base triangle"></div>
+    <h2>第二步：创建互补的三角形</h2>
+    <div class="base triangle triangle-reverse"></div>
+    <h2>第三步：合并</h2>
+    <div class="base triangle triangle-combine"></div>
+    <h2>第四步：添加另一层</h2>
+    <div class="base triangle triangle-override"></div>
+    <h1>棋盘-角向渐变</h1>
+    <div class="base conic"></div>
+</body>
+</html>

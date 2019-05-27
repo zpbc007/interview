@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .base {
+        width: 100%;
+        height: 200px;
+    }
+    .normal {
+        background: linear-gradient(90deg, #fb3 15%, #655 0, #655 40%, #ab4 0, #ab4 65%, hsl(20, 40%, 90%) 0);
+        background-size: 80px 100%;
+    }
+    .override {
+        background: hsl(20, 40%, 90%);
+        background-image: 
+            linear-gradient(90deg, #fb3 10px, transparent 0),
+            linear-gradient(90deg, #ab4 20px, transparent 0),
+            linear-gradient(90deg, #655 20px, transparent 0);
+        background-size: 80px 100%, 60px 100%, 40px 100%;
+    }
+</style>
+</header>
+<body>
+    <h1>宽度不同</h1>
+    <div class="base normal"></div>
+    <h1>分层，上层以不同宽度重复</h1>
+    <div class="base override"></div>
+</body>
+</html>

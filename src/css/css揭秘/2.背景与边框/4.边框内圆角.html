@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .base {
+        width: 300px;
+    }
+    .two {
+        background: #655;
+        padding: .8em;
+    }
+    .two > div {
+        background: tan;
+        border-radius: .8em;
+        padding: 1em;
+    }
+    .outline {
+        background: tan;
+        border-radius: .8em;
+        padding: 1em;
+        box-shadow: 0 0 0 .3em #655;
+        outline: .6em solid #655;
+    }
+</style>
+</header>
+<body>
+    <h2>两个元素的叠加</h2>
+    <div class="base two"><div>I have a nice subtle inner rounding, don't I look pretty?</div></div>
+    <h2>利用 outline 没有 radius 而 box-shadow 有</h2>
+    <div class="base outline"><div>I have a nice subtle inner rounding, don't I look pretty?</div></div>
+</body>
+</html>

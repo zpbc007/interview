@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .base {
+        width: 300px;
+        height: 200px;
+    }
+    .h-two {
+        background: linear-gradient(#fb3 50%, #58a 0);
+        background-size: 100% 30px;
+    }
+    .h-three {
+        background: linear-gradient(#fb3 33.3%, #58a 0, #58a 66.6%, yellowgreen 0);
+        background-size: 100% 45px;
+    }
+    .v-two {
+        background: linear-gradient(to right, #fb3 50%, #58a 0);
+        background-size: 30px 100%;
+    }
+    .h-v-two {
+        background: linear-gradient(45deg, #fb3 25%, #58a 0, #58a 50%, #fb3 0, #fb3 75%, #58a 0);
+        background-size: 42.5px 42.5px;
+    }
+    .h-v-two-repeat {
+        background: repeating-linear-gradient(45deg, #fb3, #fb3 15px, #58a 0, #58a 30px);
+    }
+    .color {
+        background: #58a;
+        background-image: repeating-linear-gradient(30deg, 
+            hsla(0, 0%, 100%, .1), 
+            hsla(0, 0%, 100%, .1) 15px,
+            transparent 0,
+            transparent 30px);
+    }
+</style>
+</header>
+<body>
+    <h1>水平条纹</h1>
+    <h2>两种颜色</h2>
+    <div class="base h-two"></div>
+    <h2>三种颜色</h2>
+    <div class="base h-three"></div>
+
+    <h1>垂直条纹</h1>
+    <div class="base v-two"></div>
+
+    <h1>斜向条纹 手动计算</h1>
+    <div class="base h-v-two"></div>
+
+    <h1>斜向条纹 使用repeating-linear-gradient</h1>
+    <div class="base h-v-two-repeat"></div>
+
+    <h1>斜向条纹 色彩变换</h1>
+    <div class="base color"></div>
+</body>
+</html>

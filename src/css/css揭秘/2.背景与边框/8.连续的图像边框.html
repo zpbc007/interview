@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .base {
+        width: 300px;
+    }
+    .two {
+        background: url(http://csssecrets.io/images/stone-art.jpg);
+        background-size: cover;
+        padding: 1em;
+    }
+    .two > div {
+        background: white;
+        padding: 1em
+    }
+    .one {
+        padding: 1em;
+        border: 1em solid transparent;
+        background: linear-gradient(white, white),
+                    url(http://csssecrets.io/images/stone-art.jpg);
+        background-size: cover;
+        background-clip: padding-box, border-box;
+        background-origin: border-box;
+    }
+    .letter {
+        padding: 1em;
+        border: 1em solid transparent;
+        background: 
+            linear-gradient(white, white) padding-box,
+            repeating-linear-gradient(
+                -45deg, 
+                red 0, red 12.5%, 
+                transparent 0, transparent 25%,
+                #58a 0, #58a 37.5%,
+                transparent 0, transparent 50%) 0 / 2em 2em; 
+    }
+    @keyframes ants {
+        to {
+            background-position: 100% 100%;
+        }
+    }
+
+    .marching-ants {
+        padding: 1em;
+        border: 1px solid transparent;
+        background: 
+            linear-gradient(white, white) padding-box,
+            repeating-linear-gradient(
+                -45deg, 
+                black 0, black 25%,
+                transparent 0, transparent 50%) 0 / .6em .6em;
+        animation: ants 12s linear infinite;
+    }
+</style>
+</header>
+<body>
+    <h1>两个div的覆盖</h1>
+    <div class="base two"><div>I have a nice stone art border, don't I look pretty?</div></div>
+    <h1>多个 background 的覆盖</h1>
+    <div class="base one">I have a nice stone art border, don't I look pretty?</div>
+    <h1>老式信封</h1>
+    <div class="base letter">letter</div>
+    <h1>蚂蚁行军</h1>
+    <div class="base marching-ants"></div>
+</body>
+</html>

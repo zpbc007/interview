@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <style>
+        .base {
+            max-width: 10em;
+	        min-height: 5em;
+	        padding: 10px;
+        }
+        .css3 {
+            background: url(http://csssecrets.io/images/code-pirate.svg) no-repeat #58a;
+            background-position: right 10px bottom 10px;
+        }
+        .origin {
+            background: url(http://csssecrets.io/images/code-pirate.svg) no-repeat #58a bottom right;
+            background-origin: content-box;
+        }
+        .calc {
+            background: url(http://csssecrets.io/images/code-pirate.svg) no-repeat #58a;
+            background-position: calc(100% - 10px) calc(100% - 10px);
+        }
+    </style>
+</header>
+<body>
+    <p>
+        <h2>background-position 扩展语法方案</h2>
+    </p>
+    <div class="base css3">Code Pirate</div>
+    <p>
+        <h2>background-origin方案</h2>
+    </p>
+    <div class="base origin">Code Pirate</div>
+    <p>
+        <h2>calc方案</h2>
+    </p>
+    <div class="base calc">Code Pirate</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <style>
+        .base {
+            width: 100px;
+            height: 60px;
+            background: yellowgreen;
+        }
+        .base:hover {
+            background: rebeccapurple;
+        }
+        .outer-box-shadow {
+            margin: 15px;
+            box-shadow: 0 0 0 10px #655,
+                        0 0 0 15px deeppink,
+                        0 2px 5px 15px rgba(0, 0, 0, .6);
+        }
+        .inner-box-shadow {
+            padding: 15px;
+            box-shadow: 0 0 0 10px #655 inset,
+                        0 0 0 15px deeppink inset,
+                        0 2px 5px 15px rgba(0, 0, 0, .6) inset;
+        }
+        .outline {
+            border:  10px solid #655;
+            outline: 5px solid deeppink;
+        }
+    </style>
+</header>
+
+<body>
+    <p>
+        <h2>box-shadow 方案</h2>
+        <ul>
+            <li>投影的行为与边框不一致，它不会影响布局，需要通过设置内外边距来给定阴影的大小</li>
+            <li>默认投影不会响应元素的鼠标事件，因为他在元素之外。需要给box-shadow 设置 inset 才能响应</li>
+        </ul>
+    </p>
+    <div class="base outer-box-shadow"></div>
+    <hr />
+    <div class="base inner-box-shadow"></div>
+    <hr />
+    <p>
+        <h2>outline 方案</h2>
+        <ul>
+            <li>只适用双层边框</li>
+            <li>不会贴合 border-radius 产生的圆角</li>
+        </ul>
+    </p>
+    <div class="base outline"></div>
+</body>
+
+</html>

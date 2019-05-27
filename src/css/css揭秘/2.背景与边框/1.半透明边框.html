@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <style>
+            body {
+                background: green;
+            }
+            /* 默认情况下 background-clip 为 border-box 即背景颜色在边框下 */
+            .base {
+                width: 100px;
+                height: 60px;
+                border: 10px solid hsla(0, 0%, 100%, 0.5);
+                background: white;
+            }
+            /** 设为 padding-box 后，border 下为父级而不是自己的背景 */
+            .show {
+                background-clip: padding-box;
+            }
+        </style>
+    </header>
+    <body>
+        <div class="base"></div>
+        <hr />
+        <div class="base show"></div>
+    </body>
+</html>
