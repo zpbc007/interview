@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    body {
+        padding: 100px 100px;
+    }
+    .picture {
+        width: 400px;
+        transform: rotate(45deg);
+        overflow: hidden;
+    }
+    .picture > img {
+        max-width: 100%;
+        transform: rotate(-45deg) scale(1.42);
+    }
+    .clip-path {
+        clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+        transition: 1s clip-path;
+    }
+    .clip-path:hover {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+</style>
+</header>
+<body>
+    <h1>进行缩放</h1>
+    <div class="picture"><img src="http://csssecrets.io/images/adamcatlace.jpg" /></div>
+    <h1>使用clip-path</h1>
+    <img class="clip-path" src="http://csssecrets.io/images/adamcatlace.jpg" />
+</body>
+</html>

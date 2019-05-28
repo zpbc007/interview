@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    body {
+        background: yellowgreen;
+    }
+    .base {
+        width: 300px;
+        height: 200px;
+    }
+    .one {
+        background: linear-gradient(-45deg, transparent 15px, #58a 0);
+    }
+    .two {
+        background: linear-gradient(-45deg, transparent 15px, #58a 0) right,
+                    linear-gradient(45deg, transparent 15px, #655 0) left;
+        background-size: 50% 100%;
+        background-repeat: no-repeat;
+    }
+    .four {
+        background: linear-gradient(135deg, transparent 15px, #58a 0) top left,
+                    linear-gradient(-135deg, transparent 15px, #58a 0) top right,
+                    linear-gradient(-45deg, transparent 15px, #58a 0) bottom right,
+                    linear-gradient(45deg, transparent 15px, #58a 0) bottom left;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+    }
+    .circle {
+        background: radial-gradient(circle at top left, transparent 15px, #58a 0) top left,
+                    radial-gradient(circle at top right, transparent 15px, #58a 0) top right,
+                    radial-gradient(circle at bottom left, transparent 15px, #58a 0) bottom left,
+                    radial-gradient(circle at bottom right, transparent 15px, #58a 0) bottom right;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+    }
+</style>
+</header>
+<body>
+    <h1>一个切角</h1>
+    <div class="base one"></div>
+    <h1>两个切角</h1>
+    <div class="base two"></div>
+    <h1>四个切角</h1>
+    <div class="base four"></div>
+    <h1>弧形切角</h1>
+    <div class="base circle"></div>
+</body>
+</html>

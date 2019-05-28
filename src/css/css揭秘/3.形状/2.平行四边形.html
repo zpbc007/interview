@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    body {
+        padding: 0 100px;
+    }
+    .base {
+        width: 300px;
+        height: 200px;
+        background: yellowgreen;
+    }
+    .skewX {
+        transform: skewX(-45deg);
+    }
+    .skewX-nest > div {
+        transform: skewX(45deg);
+    }
+    .pseudo {
+        position: relative;
+        box-sizing: border-box;
+        background: transparent;
+        padding: 0 100px;
+    }
+    .pseudo::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+        background: yellowgreen;
+        transform: skew(-45deg);
+    }
+</style>
+</header>
+<body>
+    <h1>
+        使用skewX进行形变 但内容也会形变
+    </h1>
+    <div class="base skewX">123</div>
+    <h1>
+        使用嵌套div 内部进行反向形变
+    </h1>
+    <div class="base skewX skewX-nest"><div>123</div></div>
+    <h1>对伪元素进行形变，由于内容并不在伪元素内，所以内容无影响</h1>
+    <div class="base pseudo">123</div>
+</body>
+</html>

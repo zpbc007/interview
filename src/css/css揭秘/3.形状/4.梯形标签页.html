@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    body {
+        padding: 100px;
+    }
+    .base {
+        width: 100px;
+        height: 80px;
+        background: yellowgreen;
+    }
+    .perspective {
+        transform: perspective(.5em) rotateX(5deg);
+    }
+    .pseudo {
+        position: relative;
+        display: inline-block;
+        padding: .5em 1em .35em;
+        color: white;
+    }
+    .pseudo::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+        background: #58a;
+        transform: perspective(.5em) rotateX(5deg);
+        transform-origin: bottom;
+    }
+</style>
+</header>
+<body>
+    <h1>内容也会形变</h1>
+    <div class="base perspective">123</div>
+    <h1>使用伪元素</h1>
+    <div class="base pseudo">123</div>
+</body>
+</html>

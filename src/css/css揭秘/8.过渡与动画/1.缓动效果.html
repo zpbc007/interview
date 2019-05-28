@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .base {
+        width: 200px;
+        height: 200px;
+        background: yellowgreen;
+    }
+
+    @keyframes bounce {
+        60%, 80%, to {
+            transform: translateY(400px);
+            animation-timing-function: ease;
+        }
+        70% {
+            transform: translateY(250px);
+        }
+        90% {
+            transform: translateY(300px);
+        }
+    }
+    .ball {
+        animation: bounce 3s cubic-bezier(.1, .25, 1, .25);
+    }
+</style>
+</header>
+<body>
+    <div class="base ball"></div>
+</body>
+</html>
