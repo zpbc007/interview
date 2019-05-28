@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .container-base {
+        width: 100%;
+        height: 300px;
+        background: white;
+        margin-bottom: 30px;
+    }
+    .border {
+        border: 1px solid black;
+    }
+
+    .float-left {
+        float: left;
+        width: 200px;
+        height: 100%;
+    }
+    .float-right {
+        float: right;
+        width: 200px;
+        height: 100%;
+    }
+    .float-middle {
+        margin: 0 210px;
+        height: 100%;
+    }
+
+    .position-container {
+        position: relative;
+    }
+    .position-left {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 200px;
+    }
+    .position-right {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 200px;
+    }
+    .position-middle {
+        margin: 0 210px;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .bfc-container {
+        overflow: hidden;
+    }
+    .bfc-container .bfc-main, .bfc-container .bfc-left, .bfc-container .bfc-right {
+        box-sizing: border-box;    
+    }
+    .bfc-middle {
+        width: 100%;
+        height: 100%;
+        float: left;
+    }
+    .bfc-main {
+        margin: 0 210px;
+        height: 100%;
+    }
+    .bfc-left {
+        width: 200px;
+        height: 100%;
+        float: left;
+        margin-left: -100%;
+    }
+    .bfc-right {
+        width: 200px;
+        height: 100%;;
+        float: left;
+        margin-left: -200px;
+    }
+
+    .flex-container {
+        display: flex;
+    }
+    .flex-left {
+        flex: none;
+        width: 200px;
+    }
+    .flex-right {
+        flex: none;
+        width: 200px;
+    }
+    .flex-middle {
+        flex: auto;
+        margin: 0 10px;
+    }
+</style>
+</header>
+<body>
+    <div class="container-base">
+        <div class="float-left border">
+            <p>宽度固定的左侧浮动</p>
+        </div>
+        <div class="float-right border">
+            <p>宽度固定的右侧浮动</p>
+        </div>
+        <div class="float-middle border">
+            <p>使用固定 margin <strong>注意 dom 结构的顺序</strong> </p>
+        </div>
+    </div>
+    <div class="container-base position-container">
+        <div class="position-left border">
+            <p>宽度固定的绝对定位</p>
+        </div>
+        <div class="position-middle border">
+            <p>
+                固定 margin
+                <strong>注意在容器有内外边距时，左右两侧不会变化</strong>
+            </p>
+        </div>
+        <div class="position-right border">
+            <p>宽度固定的绝对定位</p>
+        </div>
+    </div>
+    <div class="container-base bfc-container">
+        <div class="bfc-middle">
+            <div class="bfc-main border">
+                <p>
+                    内容使用固定 margin 值
+                </p>
+            </div>
+        </div>
+        <div class="bfc-left border">
+            <p>左侧浮动， margin-left: 100%</p>
+        </div>
+        <div class="bfc-right border">
+            <p>右侧浮动, margin-left: 固定宽度值</p>
+        </div>
+    </div>
+    <div class="container-base flex-container">
+        <div class="flex-left border"></div>
+        <div class="flex-middle border"></div>
+        <div class="flex-right border"></div>
+    </div>
+</body>
+</html>
