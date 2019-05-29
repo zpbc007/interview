@@ -5,8 +5,4 @@ export default {
     typescript: true,
     codeSandbox: false,
     open: true,
-    menu: [
-      { name: 'Hooks' },
-      { name: 'Components'}
-    ],
 }
