@@ -1,0 +1,17 @@
+---
+name: 3.removeNode
+menu: util.js
+---
+
+## 描述
+
+删除 dom 中的节点
+
+```js
+function removeNode(node) {
+    // 找到父节点
+    let parentNode = node.parentNode;
+    // 删除
+	if (parentNode) parentNode.removeChild(node);
+}
+```

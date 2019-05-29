@@ -1,0 +1,16 @@
+---
+name: 2.assign
+menu: util.js
+---
+
+## 描述
+
+将 props 上的属性复制到 obj 上
+
+```js
+export function assign(obj, props) {
+    // 遍历 props 的所有属性
+	for (let i in props) obj[i] = props[i];
+	return obj;
+}
+```
