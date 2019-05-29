@@ -5,4 +5,7 @@ export default {
     typescript: true,
     codeSandbox: false,
     open: true,
+    themeConfig: {
+        linesToScrollEditor: 999
+    }
 }
