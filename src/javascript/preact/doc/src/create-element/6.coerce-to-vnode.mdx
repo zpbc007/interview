@@ -1,0 +1,41 @@
+---
+name: 6.coerceToVNode
+menu: create-element.js
+---
+
+## 描述
+
+将各种可能值转为 vnode
+
+```js
+/**
+ * Coerce an untrusted value into a VNode
+ * Specifically, this should be used anywhere a user could provide a boolean, string, or number where
+ * a VNode or Component is desired instead
+ * @param {boolean | string | number | import('./internal').VNode} possibleVNode A possible VNode
+ */
+export function coerceToVNode(possibleVNode) {
+    // boolean 或者 null 不渲染
+    if (possibleVNode == null || typeof possibleVNode === 'boolean') return null;
+
+    // 文本节点
+	if (typeof possibleVNode === 'string' || typeof possibleVNode === 'number') {
+		return createVNode(null, possibleVNode, null, null);
+	}
+
+    // 节点数组在外面包一层 Fragment
+	if (Array.isArray(possibleVNode)) {
+		return createElement(Fragment, null, possibleVNode);
+	}
+
+    // 如果节点已经渲染过 则复制这个节点
+	if (possibleVNode._dom != null || possibleVNode._component != null) {
+		let vnode = createVNode(possibleVNode.type, possibleVNode.props, possibleVNode.key, null);
+		vnode._dom = possibleVNode._dom;
+		return vnode;
+	}
+
+    // 新建的 vnode
+	return possibleVNode;
+}
+```

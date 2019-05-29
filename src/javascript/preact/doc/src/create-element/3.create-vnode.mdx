@@ -1,0 +1,81 @@
+---
+name: 3.createVNode
+menu: create-element.js
+---
+
+## 描述 
+
+该函数用于创建最基础的虚拟节点
+
+```js
+/**
+ * @param type 节点类型
+ * @param props 节点参数
+ * @param key 节点标识
+ * @param ref 节点引用
+ */
+function createVNode(type, props, key, ref) {
+	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
+	// Do not inline into createElement and coerceToVNode!
+	const vnode = {
+		type,
+		props,
+		key,
+		ref,
+		_children: null,
+		_dom: null,
+		_lastDomChild: null,
+		_component: null,
+		constructor: undefined
+	};
+
+    // 调用钩子
+	if (options.vnode) options.vnode(vnode);
+
+	return vnode;
+}
+```
+
+## type 节点类型
+
+`type` 的类型有以下几种情况
+
+- 如果为文本节点, type 为 null
+
+|jsx|type|
+|---|---|
+|123|null|
+
+- 如果为原生 dom 节点, type 为 string
+
+|jsx|type|
+|---|---|
+|<div\>|div|
+|<p\>|p|
+|<span\>|span|
+
+- 如果为 function 类型的组件, type 为 function
+
+```jsx
+function FunctionComponent() {
+    return <div>any component</div>
+}
+```
+
+|jsx|type|
+|---|---|
+|<FunctionComponent /\>|FunctionComponent|
+
+- 如果为 class 类型的组件, type 为 class
+
+```jsx
+class ClassComponent extends Component {
+    render() {
+        return <div>class component</div>
+    }
+}
+```
+
+|jsx|type|
+|---|---|
+|<ClassComponent /\>|ClassComponent|

@@ -1,0 +1,28 @@
+---
+name: 1.文件
+menu: create-element.js
+---
+
+## 描述
+
+该文件包含了创建vnode的相关方法
+
+## jsx
+
+jsx在经过babel转码后会变为createElement方法
+
+例如:
+
+```jsx
+function TestComponent() {
+    return <div>test component</div>
+}
+```
+
+经过babel转码后会变为:
+
+```js
+function TestComponent() {
+    return React.createElement("div", null, "test component");
+}
+```

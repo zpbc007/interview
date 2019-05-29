@@ -1,0 +1,55 @@
+---
+name: 2.createElement
+menu: create-element.js
+---
+
+## 描述
+
+该函数作用如下：
+
+1. 对 props 对象进行一次浅拷贝
+2. 如果有多个子节点则将他们拼成一个数组，否则就是一个对象
+3. 将处理过的 children 放入 props 对象中
+4. 根据 defaultProps 设置 props 初始值
+4. 将 props 中的 key 和 ref 属性单独取出来
+5. 调用 [createVNode](./doc-src-create-element-create-vnode) 生成 vnode 并返回
+
+```js
+/**
+ * @param type 节点类型
+ * @param props 节点参数
+ * @param children 子节点
+ */
+function createElement(type, props, children) {
+    // 复制节点属性
+	props = assign({}, props);
+
+    // 如果有多个子节点
+	if (arguments.length>3) {
+		children = [children];
+		for (let i=3; i<arguments.length; i++) {
+			children.push(arguments[i]);
+		}
+    }
+    
+    // 将 children 放入 props 中
+	if (children!=null) {
+		props.children = children;
+	}
+
+    // 根据 defaultProps 设置 props 初始值
+	if (type != null && type.defaultProps != null) {
+		for (let i in type.defaultProps) {
+			if (props[i]===undefined) props[i] = type.defaultProps[i];
+		}
+    }
+
+    // 如果有 ref 或 key 属性 从 props 中取出
+	let ref = props.ref;
+	let key = props.key;
+	if (ref != null) delete props.ref;
+	if (key != null) delete props.key;
+
+	return createVNode(type, props, key, ref);
+}
+```
