@@ -27,6 +27,34 @@
 
 因此写 CSS 时，尽量避免过度层叠。
 
+### 改变阻塞模式 defer 与 async
+
+defer 与 async 对于 inline-script 都是无效的。
+
+#### defer
+
+```html
+<script src="app1.js" defer></script>
+<script src="app2.js" defer></script>
+<script src="app3.js" defer></script>
+```
+
+defer 属性表示延迟执行引入的 JS，即加载这段 JS 时 HTML 并未停止解析，这两个过程是并行的。整个 document 解析完毕且 defer-script 也加载完成后（两者顺序无关），会执行所有由 defer-script 加载的 JS 代码，然后触发 DOMContentLoaded 事件。
+
+defer 不会改变 script 的执行顺序。
+
+#### async
+
+```html
+<script src="app1.js" async></script>
+<script src="app2.js" async></script>
+<script src="app3.js" async></script>
+```
+
+async 表示异步执行引入的 JS，即如果 script 加载完毕就会执行。改加载方式依然会阻塞 load 事件。即 async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
+
+多个 async-script 的执行顺序是不确定的
+
 ## 构建渲染树
 
 浏览器会从 DOM 树的根节点开始遍历每个可见节点，对每个可见节点，找到其 CSS 样式规则并应用。
