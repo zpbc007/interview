@@ -37,6 +37,18 @@
         bottom: 0;
     }
 
+    .bfc-left {
+        float: left;
+        width: 200px;
+        height: 100%;
+        margin-right: 10px;
+    }
+    .bfc {
+        overflow: hidden;
+        width: calc(100% - 214px);
+        height: 100%;
+    }
+
     .flex-container {
         display: flex;
         flex-direction: row;
@@ -66,6 +78,14 @@
         </div>
         <div class="position-right border">
             <p>右侧使用绝对定位</p>
+        </div>
+    </div>
+    <div class="container-base">
+        <div class="bfc-left border">
+            <p>左侧定宽 div </p>
+        </div>
+        <div class="bfc border">
+            <p>右侧使用bfc</p>
         </div>
     </div>
     <div class="container-base flex-container">
