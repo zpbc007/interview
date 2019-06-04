@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .item {
+        background: greenyellow;
+        height: 50px;
+    }
+    .top {
+        margin-bottom: 10px;
+    }
+    .bottom {
+        margin-top: 10px;
+    }
+    .bfc {
+        overflow: hidden;
+    }
+</style>
+</header>
+<body>
+    <h1>margin 重叠演示</h1>
+    <div class="top item"></div>
+    <div class="bottom item"></div>
+
+    <h1>使用 bfc 阻止重叠</h1>
+    <div class="bfc">
+        <div class="top item"></div>
+    </div>
+    <div class="bottom item"></div>
+</body>
+</html>

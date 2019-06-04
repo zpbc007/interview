@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .bfc {
+        overflow: auto;
+    }
+    .parent {
+        width: 100%;
+        border: 1px solid black;
+        margin-bottom: 100px;
+    }
+    .child {
+        float: left;
+        height: 100px;
+        width: 100px;
+        background: yellowgreen;
+    }
+</style>
+</header>
+<body>
+    <h1>父级元素 不是 bfc 无法包含内部 float</h1>
+    <div class="parent">
+        <div class="child"></div>
+        <div class="child"></div>
+    </div>
+
+    <h1>父级元素是 bfc</h1>
+    <div class="bfc parent">
+        <div class="child"></div>
+        <div class="child"></div>
+    </div>
+</body>
+</html>

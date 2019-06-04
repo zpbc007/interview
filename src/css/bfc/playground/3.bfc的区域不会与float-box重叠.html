@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<header>
+<style>
+    .aside {
+        width: 100px;
+        height: 150px;
+        float: left;
+        background: #f66;
+    }
+    .main {
+        height: 200px;
+        overflow: hidden;
+        background: #fcc;
+    }
+    .text {
+        width: 500px;
+    }
+</style>
+</header>
+<body>
+    <h1>text 与 aside 覆盖 但 main 与 aside 由于触发了 bfc 没有覆盖</h1>
+    <div class="aside"></div>
+    <div class="text">
+        <div class="main"></div>
+    </div>
+</body>
+</html>
