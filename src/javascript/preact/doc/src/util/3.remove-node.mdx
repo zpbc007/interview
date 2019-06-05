@@ -5,7 +5,7 @@ menu: util.js
 
 ## 描述
 
-删除 dom 中的节点
+删除 dom 中的节点，IE11 中不支持 Element.remove()，使用此方法比使用 polyfill 代码量更小
 
 ```js
 function removeNode(node) {
