@@ -1,0 +1,17 @@
+---
+name: 3.process
+menu: create-element.js
+---
+
+```js
+/** 清空渲染队列 */
+function process() {
+    let p;
+    // 按深度排序 从内向外渲染
+	q.sort((a, b) => b._depth - a._depth);
+	while ((p=q.pop())) {
+		// forceUpdate's callback argument is reused here to indicate a non-forced update.
+		if (p._dirty) p.forceUpdate(false);
+	}
+}
+```

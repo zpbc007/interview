@@ -1,0 +1,92 @@
+---
+name: 2.createVNode
+menu: component.js
+---
+
+## 描述
+
+```js
+/**
+ * 基础组件类。 提供 setState、forceUpdate 方法用于触发渲染
+ * @param {object} props
+ * @param {object} context The initial context from parent components'
+ * getChildContext
+ */
+export function Component(props, context) {
+	this.props = props;
+	this.context = context;
+	// this.constructor // When component is functional component, this is reset to functional component
+	// if (this.state==null) this.state = {};
+	// this.state = {};
+	// this._dirty = true;
+	// this._renderCallbacks = []; // Only class components
+
+	// Other properties that Component will have set later,
+	// shown here as commented out for quick reference
+	// this.base = null;
+	// this._context = null;
+	// this._ancestorComponent = null; // Always set right after instantiation
+	// this._vnode = null;
+	// this._nextState = null; // Only class components
+	// this._prevVNode = null;
+	// this._processingException = null; // Always read, set only when handling error
+	// this._pendingError = null; // Always read, set only when handling error. This is used to indicate at diffTime to set _processingException
+}
+```
+
+setState 方法
+
+```js
+/**
+ * Update component state and schedule a re-render.
+ * @param {object | ((s: object, p: object) => object)} update 需要更新的部分状态或者一个返回新的状态的一个方法
+ * @param {() => void} [callback] 组件状态更新后回调
+ */
+Component.prototype.setState = function(update, callback) {
+    // only clone state when copying to nextState the first time.
+    // 只有第一次更新时 将 state 复制到 _nextState 上
+	let s = (this._nextState !== this.state && this._nextState) || (this._nextState = assign({}, this.state));
+
+    // if update() mutates state in-place, skip the copy:
+    // 更新状态
+	if (typeof update!=='function' || (update = update(s, this.props))) {
+		assign(s, update);
+	}
+
+    // 当 update 方法返回 null 时跳过更新
+	if (update==null) return;
+
+	if (this._vnode) {
+        // 添加回调
+        if (callback) this._renderCallbacks.push(callback);
+        // 将字节添加到渲染队列中
+		enqueueRender(this);
+	}
+};
+```
+
+forceUpdate 方法
+
+```js
+/**
+ * 立即同步执行 render 方法
+ * @param {() => void} [callback] 组件重新渲染后的回调函数
+ */
+Component.prototype.forceUpdate = function(callback) {
+	let vnode = this._vnode, dom = this._vnode._dom, parentDom = this._parentDom;
+	if (parentDom) {
+		// Set render mode so that we can differantiate where the render request
+		// is coming from. We need this because forceUpdate should never call
+		// shouldComponentUpdate
+		const force = callback !== false;
+
+		let mounts = [];
+		dom = diff(parentDom, vnode, vnode, this._context, parentDom.ownerSVGElement!==undefined, null, mounts, this._ancestorComponent, force, dom);
+		if (dom!=null && dom.parentNode!==parentDom) {
+			parentDom.appendChild(dom);
+		}
+		commitRoot(mounts, vnode);
+	}
+	if (callback) callback();
+};
+```

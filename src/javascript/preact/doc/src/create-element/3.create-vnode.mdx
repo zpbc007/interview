@@ -22,8 +22,11 @@ function createVNode(type, props, key, ref) {
 		props,
 		key,
 		ref,
+		// 当前节点子节点 diffChildren 方法中进行的赋值
 		_children: null,
+		// 根据 vnode 渲染出的真实 dom
 		_dom: null,
+		// Fragment 的 dom 子节点
 		_lastDomChild: null,
 		_component: null,
 		constructor: undefined

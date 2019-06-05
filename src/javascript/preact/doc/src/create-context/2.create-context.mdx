@@ -1,0 +1,52 @@
+---
+name: 2.createContext
+menu: create-element.js
+---
+
+```js
+let i = 0;
+function createContext(defaultValue) {
+    // 闭包管理当前 context
+	const ctx = {};
+
+	const context = {
+        // 自增 id
+		_id: '__cC' + i++,
+		_defaultValue: defaultValue,
+		Consumer(props, context) {
+			return props.children(context);
+		},
+		Provider(props) {
+			if (!this.getChildContext) {
+				const subs = [];
+				this.getChildContext = () => {
+					ctx[context._id] = this;
+					return ctx;
+				};
+				this.shouldComponentUpdate = props => {
+					subs.some(c => {
+						// Check if still mounted
+						if (c._parentDom) {
+							c.context = props.value;
+							enqueueRender(c);
+						}
+					});
+				};
+				this.sub = (c) => {
+					subs.push(c);
+					let old = c.componentWillUnmount;
+					c.componentWillUnmount = () => {
+						subs.splice(subs.indexOf(c), 1);
+						old && old.call(c);
+					};
+				};
+			}
+			return props.children;
+		}
+	};
+
+	context.Consumer.contextType = context;
+
+	return context;
+}
+```

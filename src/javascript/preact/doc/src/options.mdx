@@ -1,0 +1,40 @@
+---
+name: 文件
+menu: options.js
+---
+
+## 描述
+
+该文件向外暴露一个空对象，用于在外部进行配置
+
+## 类型定义
+
+```ts
+interface Options {
+    /** render 方法执行前的钩子 */
+    /** Attach a hook that is invoked before render, mainly to check the arguments. */
+    root?(vnode: ComponentChild, parent: Element | Document | ShadowRoot | DocumentFragment): void;
+    /** 创建 vnode 时的钩子 可以在改函数内对 vnode 进行更改 */
+    vnode(vnode: VNode): void;
+    /** Attach a hook that is invoked after a tree was mounted or was updated. */
+    commit?(vnode: VNode): void;
+    /** Attach a hook that is invoked immediately before a component is unmounted. */
+    unmount?(vnode: VNode): void;
+    /** Attach a hook that is invoked before a vnode is diffed. */
+    diff?(vnode: VNode): void;
+    /** Attach a hook that is invoked before a vnode has rendered. */
+    render?(vnode: VNode): void;
+    /** Attach a hook that is invoked before a hook's state is queried. */
+    hook?(component: Component): void;
+    /** Attach a hook that is invoked after a vnode has rendered. */
+    diffed?(vnode: VNode): void;
+    event?(e: Event): void;
+    useDebugValue?(value: string | number): void;
+}
+```
+
+- `root` 钩子在 [render](/doc-src-render-2-render) 中被调用
+- `vnode` 钩子在 [createVNode](/doc-src-create-element-3-create-vnode) 中被调用
+- `commit` 钩子在 [commitRoot]() 中被调用
+- `diff` 钩子在 [diff](/doc-src-diff-index-2-diff) 中被调用
+- `unmount` 钩子在 [unmount](/doc-src-diff-index-3-unmount) 中被调用

@@ -1,0 +1,32 @@
+---
+name: 4.applyRef
+menu: diff/index.js
+---
+
+## 描述
+
+该函数用于跟新 ref 的值，
+- ref 为函数: 将值传入函数中
+- ref 为对象: 更新对象的 current 属性
+
+```js
+/**
+ * @param ref 引用可以为对象或者函数
+ * @param value ref 中引用的值
+ * @param ancestorComponent 父级 vnode
+ */
+export function applyRef(ref, value, ancestorComponent) {
+	try {
+        // ref 为函数 调用
+		if (typeof ref == 'function') {
+            ref(value);
+        // ref 为对象 更新它的 current 
+        } else {
+            ref.current = value;
+        }
+	}
+	catch (e) {
+		catchErrorInComponent(e, ancestorComponent);
+	}
+}
+```

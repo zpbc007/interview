@@ -1,0 +1,17 @@
+---
+name: 4.defer
+menu: component.js
+---
+
+```js
+/**
+ * 异步执行回调
+ * @type {(cb) => void}
+ * 如果有 promise 则是否 promise 否则用 setTimeout 代替
+ */
+const defer = typeof Promise == 'function' ? 
+    // promise 的 then 方法是微任务会异步执行
+    Promise.prototype.then.bind(Promise.resolve()) : 
+    // setTimeout 是宏任务会在微任务清空后执行
+    setTimeout;
+```

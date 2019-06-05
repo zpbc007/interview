@@ -1,0 +1,52 @@
+---
+name: 5.catchErrorInComponent
+menu: diff/index.js
+---
+
+```js
+/**
+ * Find the closest error boundary to a thrown error and call it
+ * @param error 错误信息
+ * @param component 产生错误的父级节点
+ */
+function catchErrorInComponent(error, component) {
+	// thrown Promises are meant to suspend...
+	let isSuspend = typeof error.then === 'function';
+	let suspendingComponent = component;
+
+	for (; component; component = component._ancestorComponent) {
+		if (!component._processingException) {
+			try {
+				if (isSuspend) {
+					if (component._childDidSuspend) {
+						component._childDidSuspend(error);
+					}
+					else {
+						continue;
+					}
+				}
+				else if (component.constructor && component.constructor.getDerivedStateFromError!=null) {
+					component.setState(component.constructor.getDerivedStateFromError(error));
+				}
+				else if (component.componentDidCatch != null) {
+					component.componentDidCatch(error);
+				}
+				else {
+					continue;
+				}
+				return enqueueRender(component._pendingError = component);
+			}
+			catch (e) {
+				error = e;
+				isSuspend = false;
+			}
+		}
+	}
+
+	if (isSuspend) {
+		return catchErrorInComponent(new Error('Missing Suspense'), suspendingComponent);
+	}
+
+	throw error;
+}
+```

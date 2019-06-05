@@ -1,0 +1,48 @@
+---
+name: 2.render
+menu: render.js
+---
+
+## 描述
+
+将虚拟节点渲染到 dom 中
+
+如果没有 replaceNode 参数，则会在 dom 中直接添加 vnode 的渲染结果，
+
+```js
+/**
+ * @param vnode 虚拟节点
+ * @param parentDom 放置虚拟节点的真实节点
+ * @param replaceNode parentDom 的子节点，用于与 vnode 进行比对
+ */
+export function render(vnode, parentDom, replaceNode) {
+    // 调用 root 钩子
+    if (options.root) options.root(vnode, parentDom);
+    // 从 dom 中取出之前渲染的 vnode
+    let oldVNode = parentDom._prevVNode;
+    // 用 Fragment 包裹 因为 diffChildren 方法只比对节点的子节点
+	vnode = createElement(Fragment, null, [vnode]);
+
+	let mounts = [];
+	diffChildren(
+		parentDom,
+		// 新的 vnode, 如果 replaceNode 不存在则将 vnode 视为 _prevVNode
+		replaceNode ? vnode : (parentDom._prevVNode = vnode),
+		oldVNode,
+		// context 为空
+		EMPTY_OBJ,
+		// 判断是否为 svg 元素
+		parentDom.ownerSVGElement !== undefined,
+		replaceNode
+			? [replaceNode]
+			: oldVNode
+				? null
+				: EMPTY_ARR.slice.call(parentDom.childNodes),
+		mounts,
+		vnode,
+		// 用于比对的 dom
+		replaceNode || EMPTY_OBJ
+	);
+	commitRoot(mounts, vnode);
+}
+```

@@ -1,0 +1,27 @@
+---
+name: 2.commitRoot
+menu: diff/index.js
+---
+
+```js
+/**
+ * 组件已渲染完毕时调用
+ * @param mounts 已经渲染的组件
+ * @param root 根 vnode
+ */
+function commitRoot(mounts, root) {
+	let c;
+	while ((c = mounts.pop())) {
+		try {
+            // 调用组件 didMount 方法
+			c.componentDidMount();
+		}
+		catch (e) {
+			catchErrorInComponent(e, c._ancestorComponent);
+		}
+	}
+
+    // 调用 commit 钩子
+	if (options.commit) options.commit(root);
+}
+```

@@ -1,0 +1,60 @@
+---
+name: 3.unmount
+menu: diff/index.js
+---
+
+```js
+/**
+ * 从虚拟 dom 和 真实 dom 中删除节点
+ * @param vnode 被删除的 vnode 节点
+ * @param ancestorComponent 被删除的 vnode 节点的父级 vnode
+ * @param {boolean} [skipRemove] 此节点的父节点已经从 DOM 中删除到了
+ */
+export function unmount(vnode, ancestorComponent, skipRemove) {
+    let r;
+    // 调用 unmount 钩子
+	if (options.unmount) options.unmount(vnode);
+
+    // 如果有 ref 将 ref 置空 并更新
+	if (r = vnode.ref) {
+		applyRef(r, null, ancestorComponent);
+	}
+
+	let dom;
+	// 父节点没有被删除 且不是 Fragment
+	if (!skipRemove && vnode._lastDomChild == null) {
+		// 如果有 _dom 由于当前节点已经被删除 所以将 skipRemove = true
+		skipRemove = (dom = vnode._dom)!= null;
+	}
+
+	// 清空节点引用
+	vnode._dom = vnode._lastDomChild = null;
+
+	// 为组件
+	if ((r = vnode._component)!=null) {
+		// 调用组件 componentWillUnmount 生命周期
+		if (r.componentWillUnmount) {
+			try {
+				r.componentWillUnmount();
+			}
+			catch (e) {
+				catchErrorInComponent(e, ancestorComponent);
+			}
+		}
+
+
+		// 清空引用
+		r.base = r._parentDom = null;
+		if (r = r._prevVNode) unmount(r, ancestorComponent, skipRemove);
+	}
+	else if (r = vnode._children) {
+		// 遍历卸载子节点
+		for (let i = 0; i < r.length; i++) {
+			if (r[i]) unmount(r[i], ancestorComponent, skipRemove);
+		}
+	}
+
+	// 从 dom 中删除节点
+	if (dom!=null) removeNode(dom);
+}
+```

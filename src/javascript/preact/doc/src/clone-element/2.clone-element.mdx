@@ -1,0 +1,18 @@
+---
+name: 2.cloneElement
+menu: clone-element.js
+---
+
+```js
+/**
+ * 复制 vnode 可以添加新的 props 和子节点
+ * @param {import('./internal').VNode} vnode The virtual DOM element to clone
+ * @param {object} props 需要改变的 props
+ * @param {Array<import('./index').ComponentChildren>} rest 其他参数会被作为子节点处理
+ */
+export function cloneElement(vnode, props) {
+	props = assign(assign({}, vnode.props), props);
+	if (arguments.length>2) props.children = EMPTY_ARR.slice.call(arguments, 2);
+	return createVNode(vnode.type, props, props.key || vnode.key, props.ref || vnode.ref);
+}
+```

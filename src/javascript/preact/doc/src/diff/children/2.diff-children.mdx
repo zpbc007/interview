@@ -1,0 +1,139 @@
+---
+name: 2.diffChildren
+menu: diff/children.js
+---
+
+```js
+/**
+ * 比对虚拟节点的子节点
+ * @param parentDom 父级 dom 节点，它的子节点将与 vnode 进行比对
+ * @param newParentVNode 父级 vnode 节点，它的子节点将进行比对
+ * @param oldParentVNode 旧父级 vnode 节点，用于比对
+ * @param context 当前 context 对象
+ * @param isSvg 是否为 svg
+ * @param {Array<import('../internal').PreactElement>} excessDomChildren 额外的 dom 节点
+ * @param {Array<import('../internal').Component>} mounts The list of components
+ * which have mounted
+ * @param {import('../internal').Component} ancestorComponent The direct parent
+ * component to the ones being diffed
+ * @param {Node | Text} oldDom The current attached DOM
+ * element any new dom elements should be placed around. Likely `null` on first
+ * render (except when hydrating). Can be a sibling DOM element when diffing
+ * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
+ */
+export function diffChildren(parentDom, newParentVNode, oldParentVNode, context, isSvg, excessDomChildren, mounts, ancestorComponent, oldDom) {
+	let childVNode, i, j, oldVNode, newDom, sibDom;
+
+    // 获取新的子节点数组 如果节点首次渲染会将 props 中的 children 转换后放到 _children 属性上
+	let newChildren = newParentVNode._children || toChildArray(newParentVNode.props.children, newParentVNode._children=[], coerceToVNode, true);
+	// 旧的子节点数组 用于比对 newChildren
+	let oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
+
+	let oldChildrenLength = oldChildren.length;
+
+    // 这部分逻辑只有在几个特定情况下才会被执行(最外层的 render 与 diffElementNodes) 
+    // 使用 EMPTY_OBJ 而不是 null 来判断是否是这几种特定状态
+    // 当 oldDom 为 null 时 应该跳过此段逻辑
+    // 例如: 如果挂载一颗新的树 应该跳过与旧节点的比对
+	if (oldDom == EMPTY_OBJ) {
+        oldDom = null;
+        // 有其他的节点 oldDom 为第一个不为 null 的节点
+		if (excessDomChildren != null) {
+			for (i = 0; !oldDom && i < excessDomChildren.length; i++) {
+				oldDom = excessDomChildren[i];
+			}
+		}
+		// 没有其他的节点 oldDom 为第一个 old vnode 的 _dom
+		else {
+			for (i = 0; !oldDom && i < oldChildrenLength; i++) {
+				oldDom = oldChildren[i] && oldChildren[i]._dom;
+			}
+		}
+	}
+
+    // 遍历新的节点
+	for (i = 0; i < newChildren.length; i++) {
+        // 转为 vnode
+		childVNode = newChildren[i] = coerceToVNode(newChildren[i]);
+
+		if (childVNode != null) {
+			// 与 childVNode 相对应的之前的 vnode （先找相同顺序的 否则遍历子节点查找）
+			oldVNode = oldChildren[i];
+
+			// 通过 key 与 type 匹配节点
+			// 如果旧的 vnode 跟当前 vnode 相对应， 通过将该节点置为 undefined 避免节点被卸载 null 已经用于空节点的占位了
+			if (oldVNode === null || (oldVNode && childVNode.key == oldVNode.key && childVNode.type === oldVNode.type)) {
+				oldChildren[i] = undefined;
+			}
+			// 在旧的 vnode 中没有找到对应的节点
+			else {
+				// 遍历旧节点 找到与 当前节点匹配的那个
+				// Either oldVNode === undefined or oldChildrenLength > 0,
+				// so after this loop oldVNode == null or oldVNode is a valid value.
+				for (j = 0; j < oldChildrenLength; j++) {
+					oldVNode = oldChildren[j];
+					// 与之前匹配规则一致
+					if (oldVNode && childVNode.key == oldVNode.key && childVNode.type === oldVNode.type) {
+						oldChildren[j] = undefined;
+						break;
+					}
+					oldVNode = null;
+				}
+			}
+
+			// 经过以上逻辑后会找到与当前节点对应的旧节点
+
+			// 通过 diff 后得到新的 dom 节点，此时还没有渲染到 dom 中
+			newDom = diff(parentDom, childVNode, oldVNode, context, isSvg, excessDomChildren, mounts, ancestorComponent, null, oldDom);
+
+			// newDom 为空说明 节点已经被 unmount 了
+			if (newDom != null) {
+				if (childVNode._lastDomChild != null) {
+					// Only Fragments or components that return Fragment like VNodes will
+					// have a non-null _lastDomChild. Continue the diff from the end of
+					// this Fragment's DOM tree.
+					newDom = childVNode._lastDomChild;
+				}
+				else if (excessDomChildren == oldVNode || newDom != oldDom || newDom.parentNode == null) {
+					// NOTE: excessDomChildren==oldVNode above:
+					// This is a compression of excessDomChildren==null && oldVNode==null!
+					// The values only have the same type when `null`.
+
+					outer: if (oldDom == null || oldDom.parentNode !== parentDom) {
+						parentDom.appendChild(newDom);
+					}
+					else {
+						// `j<oldChildrenLength; j+=2` is an alternative to `j++<oldChildrenLength/2`
+						for (sibDom = oldDom, j=0; (sibDom=sibDom.nextSibling) && j<oldChildrenLength; j+=2) {
+							if (sibDom==newDom) {
+								break outer;
+							}
+						}
+						parentDom.insertBefore(newDom, oldDom);
+					}
+				}
+
+				oldDom = newDom.nextSibling;
+			}
+		}
+	}
+
+	// 只有 hydrate 方法会用到
+	// 删除 excessDomChildren 中不属于任何 vnode 的节点
+	if (excessDomChildren != null && newParentVNode.type !== Fragment) {
+		for ( i = excessDomChildren.length; i--; ) {
+			if (excessDomChildren[i] != null) {
+				removeNode(excessDomChildren[i]);
+			}
+		}
+	}
+
+	// 删除 oldChildren 中的节点
+	// Remove remaining oldChildren if there are any.
+	for ( i= oldChildrenLength; i--; ) {
+		if (oldChildren[i] != null) {
+			unmount(oldChildren[i], ancestorComponent);
+		}
+	}
+}
+```
