@@ -1,6 +1,6 @@
 /**
  * 子类调用父类构造函数 继承属性
- * 子类原型的原型指向父类原型 继承·
+ * 子类原型的原型指向父类原型 继承方法
  */
 
 function inheritPrototype(subType, superType) {
