@@ -75,12 +75,11 @@ forceUpdate 方法
 Component.prototype.forceUpdate = function(callback) {
 	let vnode = this._vnode, dom = this._vnode._dom, parentDom = this._parentDom;
 	if (parentDom) {
-		// Set render mode so that we can differantiate where the render request
-		// is coming from. We need this because forceUpdate should never call
-		// shouldComponentUpdate
+		// callback 为 false 时是正常的更新，forceUpdate 时不应该调用 shouldComponentUpdate
 		const force = callback !== false;
 
 		let mounts = [];
+		// 获取 diff 后的节点
 		dom = diff(parentDom, vnode, vnode, this._context, parentDom.ownerSVGElement!==undefined, null, mounts, this._ancestorComponent, force, dom);
 		if (dom!=null && dom.parentNode!==parentDom) {
 			parentDom.appendChild(dom);

@@ -1,0 +1,23 @@
+---
+name: 3.enqueueRender
+menu: component.js
+---
+
+## 描述
+
+```js
+/**
+ * 将组件加入渲染队列中
+ * 如果组件同步多次调用 setState 会执行多次 enqueueRender
+ * 只有第一次会异步调用 process 方法
+ * 因此会将多次的 setState 合并
+ * @param c 要渲染的组件
+ */
+export function enqueueRender(c) {
+    // _dirty 用于标记组件是否已经在队列中
+    // 首次进入将组件加入队列
+	if (!c._dirty && (c._dirty = true) && q.push(c) === 1) {
+		(options.debounceRendering || defer)(process);
+	}
+}
+```

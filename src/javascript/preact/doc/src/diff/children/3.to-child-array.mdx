@@ -11,8 +11,7 @@ menu: diff/children.js
 /**
  * 将虚拟子节点转为一维数组 
  * @param {import('../index').ComponentChildren} children 子节点
- * children of a virtual node
- * @param {Array<import('../internal').VNode | null>} [flattened] An flat array of children to modify
+ * @param {Array<import('../internal').VNode | null>} [flattened] 转换结果
  * @param map 为每个非空节点调用的 map 函数
  * @param {boolean} [keepHoles] 是否将 undefined 转为 null 对于 <Foo /> 这种没有子节点的组件是必要的.
  */
@@ -21,7 +20,7 @@ export function toChildArray(children, flattened, map, keepHoles) {
 
     // 没有子节点或者子节点为 boolean 类型
 	if (children == null || typeof children === 'boolean') {
-        // TODO: 为啥要 push null
+		// 添加 null 用于占位
 		if (keepHoles) flattened.push(null);
     }
     // 数组进行递归

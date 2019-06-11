@@ -1,0 +1,91 @@
+---
+name: 4.diffElementNodes
+menu: diff/index.js
+---
+
+```js
+/**
+ * 对新旧 vnode 进行 diff  并将改变添加到 dom 节点上
+ * @param dom vnode 对应的真实 dom 节点
+ * @param newVNode 新的 vnode
+ * @param oldVNode 旧的 vnode
+ * @param context context 对象
+ * @param isSvg 是否为 svg 元素
+ * @param excessDomChildren
+ * @param mounts diffChildren 参数
+ * @param ancestorComponent diffChildren 参数
+ */
+function diffElementNodes(dom, newVNode, oldVNode, context, isSvg, excessDomChildren, mounts, ancestorComponent) {
+	let i;
+	let oldProps = oldVNode.props;
+	let newProps = newVNode.props;
+
+	// Tracks entering and exiting SVG namespace when descending through the tree.
+	isSvg = newVNode.type === 'svg' || isSvg;
+
+	// dom 为空 excessDomChildren 不为空
+	// 从 excessDomChildren 中找到对应的 dom 节点， 并将 excessDomChildren 中的对应位置置空
+	if (dom==null && excessDomChildren!=null) {
+		for (i=0; i<excessDomChildren.length; i++) {
+			const child = excessDomChildren[i];
+			if (child!=null && (newVNode.type===null ? child.nodeType===3 : child.localName===newVNode.type)) {
+				dom = child;
+				excessDomChildren[i] = null;
+				break;
+			}
+		}
+	}
+
+	// 没有对应的 dom 节点 创建之
+	if (dom==null) {
+		// 文本节点
+		if (newVNode.type===null) {
+			return document.createTextNode(newProps);
+		}
+		// 如果为 svg 创建 新的
+		dom = isSvg ? document.createElementNS('http://www.w3.org/2000/svg', newVNode.type) : document.createElement(newVNode.type);
+		// 由于创建了一个新的父级，因此没有可重用的 dom 节点了
+		excessDomChildren = null;
+	}
+
+	// 如果为文本节点
+	if (newVNode.type===null) {
+		// 直接将 props 附加到 dom 上
+		if (oldProps !== newProps) {
+			dom.data = newProps;
+		}
+	}
+	else {
+		if (excessDomChildren!=null && dom.childNodes!=null) {
+			excessDomChildren = EMPTY_ARR.slice.call(dom.childNodes);
+		}
+		// 不是同一个 vnode
+		if (newVNode!==oldVNode) {
+			let oldProps = oldVNode.props || EMPTY_OBJ;
+			let newProps = newVNode.props;
+
+			// 对 dangerouslySetInnerHTML 的处理
+			let oldHtml = oldProps.dangerouslySetInnerHTML;
+			let newHtml = newProps.dangerouslySetInnerHTML;
+			if ((newHtml || oldHtml) && excessDomChildren==null) {
+				// Avoid re-applying the same '__html' if it did not changed between re-render
+				if (!newHtml || !oldHtml || newHtml.__html!=oldHtml.__html) {
+					dom.innerHTML = newHtml && newHtml.__html || '';
+				}
+			}
+
+			// 设置 multiple 属性
+			if (newProps.multiple) {
+				dom.multiple = newProps.multiple;
+			}
+
+			// diff 子节点
+			diffChildren(dom, newVNode, oldVNode, context, newVNode.type==='foreignObject' ? false : isSvg, excessDomChildren, mounts, ancestorComponent, EMPTY_OBJ);
+			// diff props
+			diffProps(dom, newProps, oldProps, isSvg);
+		}
+	}
+
+	return dom;
+}
+```

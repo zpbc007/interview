@@ -9,9 +9,7 @@ menu: create-element.js
 
 ```js
 /**
- * Coerce an untrusted value into a VNode
- * Specifically, this should be used anywhere a user could provide a boolean, string, or number where
- * a VNode or Component is desired instead
+ * 将一个不确定的节点描述转为虚拟节点
  * @param {boolean | string | number | import('./internal').VNode} possibleVNode A possible VNode
  */
 export function coerceToVNode(possibleVNode) {
@@ -28,7 +26,7 @@ export function coerceToVNode(possibleVNode) {
 		return createElement(Fragment, null, possibleVNode);
 	}
 
-    // 如果节点已经渲染过 则复制这个节点
+    // 如果节点已经渲染过 则复制这个节点 why
 	if (possibleVNode._dom != null || possibleVNode._component != null) {
 		let vnode = createVNode(possibleVNode.type, possibleVNode.props, possibleVNode.key, null);
 		vnode._dom = possibleVNode._dom;

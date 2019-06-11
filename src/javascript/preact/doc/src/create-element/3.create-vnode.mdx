@@ -15,14 +15,14 @@ menu: create-element.js
  * @param ref 节点引用
  */
 function createVNode(type, props, key, ref) {
-	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
-	// Do not inline into createElement and coerceToVNode!
+	// 如果变量在同一个调用位置声明，v8 似乎能够更好地判断它的类型
+	// 在 createElement 和 coerceToVNode 需要调用此方法
 	const vnode = {
 		type,
 		props,
 		key,
 		ref,
-		// 当前节点子节点 diffChildren 方法中进行的赋值
+		// 当前节点子节点（经过处理的 vnode 数组） (diffChildren 方法中进行的赋值)
 		_children: null,
 		// 根据 vnode 渲染出的真实 dom
 		_dom: null,

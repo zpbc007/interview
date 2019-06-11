@@ -1,0 +1,282 @@
+---
+menu: hooks
+---
+
+```js
+let currentIndex;
+
+let currentComponent;
+
+let afterPaintEffects = [];
+
+let oldBeforeRender = options.render;
+// 更改组件 render 方法
+options.render = vnode => {
+    // 执行钩子
+	if (oldBeforeRender) oldBeforeRender(vnode);
+
+    // 当前渲染组件
+    currentComponent = vnode._component;
+    // index 从0 开始
+	currentIndex = 0;
+
+	if (currentComponent.__hooks) {
+		currentComponent.__hooks._pendingEffects = handleEffects(currentComponent.__hooks._pendingEffects);
+	}
+};
+
+let oldAfterDiff = options.diffed;
+options.diffed = vnode => {
+	if (oldAfterDiff) oldAfterDiff(vnode);
+
+	const c = vnode._component;
+	if (!c) return;
+
+	const hooks = c.__hooks;
+	if (hooks) {
+		hooks._pendingLayoutEffects = handleEffects(hooks._pendingLayoutEffects);
+	}
+};
+
+
+let oldBeforeUnmount = options.unmount;
+options.unmount = vnode => {
+	if (oldBeforeUnmount) oldBeforeUnmount(vnode);
+
+	const c = vnode._component;
+	if (!c) return;
+
+	const hooks = c.__hooks;
+	if (hooks) {
+        // 执行 cleanup
+		hooks._list.forEach(hook => hook._cleanup && hook._cleanup());
+	}
+};
+
+/**
+ * Get a hook's state from the currentComponent
+ * @param {number} index The index of the hook to get
+ * @returns {import('./internal').HookState}
+ */
+function getHookState(index) {
+    // 
+	if (options.hook) options.hook(currentComponent);
+	// Largely inspired by:
+	// * https://github.com/michael-klein/funcy.js/blob/f6be73468e6ec46b0ff5aa3cc4c9baf72a29025a/src/hooks/core_hooks.mjs
+	// * https://github.com/michael-klein/funcy.js/blob/650beaa58c43c33a74820a3c98b3c7079cf2e333/src/renderer.mjs
+	// Other implementations to look at:
+    // * https://codesandbox.io/s/mnox05qp8
+    // 当前组件钩子
+	const hooks = currentComponent.__hooks || (currentComponent.__hooks = { _list: [], _pendingEffects: [], _pendingLayoutEffects: [] });
+
+	if (index >= hooks._list.length) {
+		hooks._list.push({});
+	}
+	return hooks._list[index];
+}
+
+export function useState(initialState) {
+	return useReducer(invokeOrReturn, initialState);
+}
+
+export function useReducer(reducer, initialState, init) {
+
+    const hookState = getHookState(currentIndex++);
+    // 首次
+	if (!hookState._component) {
+		hookState._component = currentComponent;
+
+		hookState._value = [
+            // 初始值
+			!init ? invokeOrReturn(null, initialState) : init(initialState),
+            // dispatch 方法
+			action => {
+				const nextValue = reducer(hookState._value[0], action);
+				if (hookState._value[0]!==nextValue) {
+                    hookState._value[0] = nextValue;
+                    // 使组件更新
+					hookState._component.setState({});
+				}
+			}
+		];
+	}
+
+	return hookState._value;
+}
+
+/**
+ * @param callback 回调
+ * @param args 依赖
+ */
+export function useEffect(callback, args) {
+
+	const state = getHookState(currentIndex++);
+	if (argsChanged(state._args, args)) {
+		state._value = callback;
+		state._args = args;
+
+		currentComponent.__hooks._pendingEffects.push(state);
+		afterPaint(currentComponent);
+	}
+}
+
+/**
+ * @param {import('./internal').Effect} callback
+ * @param {any[]} args
+ */
+export function useLayoutEffect(callback, args) {
+
+	const state = getHookState(currentIndex++);
+	if (argsChanged(state._args, args)) {
+		state._value = callback;
+		state._args = args;
+		currentComponent.__hooks._pendingLayoutEffects.push(state);
+	}
+}
+
+export function useRef(initialValue) {
+	const state = getHookState(currentIndex++);
+	if (!state._value) {
+		state._value = { current: initialValue };
+	}
+
+	return state._value;
+}
+
+export function useImperativeHandle(ref, createHandle, args) {
+	const state = getHookState(currentIndex++);
+	if (argsChanged(state._args, args)) {
+		state._args = args;
+		if (ref) {
+			ref.current = createHandle();
+		}
+	}
+}
+
+/**
+ * @param {() => any} callback
+ * @param {any[]} args
+ */
+export function useMemo(callback, args) {
+
+	const state = getHookState(currentIndex++);
+	if (argsChanged(state._args, args)) {
+		state._args = args;
+		state._callback = callback;
+		return state._value = callback();
+	}
+
+	return state._value;
+}
+
+/**
+ * @param {() => void} callback
+ * @param {any[]} args
+ */
+export function useCallback(callback, args) {
+	return useMemo(() => callback, args);
+}
+
+/**
+ * @param {import('./internal').PreactContext} context
+ */
+export function useContext(context) {
+	const provider = currentComponent.context[context._id];
+	if (!provider) return context._defaultValue;
+	const state = getHookState(currentIndex++);
+	// This is probably not safe to convert to "!"
+	if (state._value == null) {
+		state._value = true;
+		provider.sub(currentComponent);
+	}
+	return provider.props.value;
+}
+
+/**
+ * Display a custom label for a custom hook for the devtools panel
+ * @type {<T>(value: T, cb?: (value: T) => string | number) => void}
+ */
+export function useDebugValue(value, formatter) {
+	if (options.useDebugValue) {
+		options.useDebugValue(formatter ? formatter(value) : value);
+	}
+}
+
+// Note: if someone used Component.debounce = requestAnimationFrame,
+// then effects will ALWAYS run on the NEXT frame instead of the current one, incurring a ~16ms delay.
+// Perhaps this is not such a big deal.
+/**
+ * Invoke a component's pending effects after the next frame renders
+ * @type {(component: import('./internal').Component) => void}
+ */
+/* istanbul ignore next */
+let afterPaint = () => {};
+
+/**
+ * After paint effects consumer.
+ */
+function flushAfterPaintEffects() {
+	afterPaintEffects.some(component => {
+		component._afterPaintQueued = false;
+		if (component._parentDom) {
+			component.__hooks._pendingEffects = handleEffects(component.__hooks._pendingEffects);
+		}
+	});
+	afterPaintEffects = [];
+}
+
+function scheduleFlushAfterPaint() {
+	setTimeout(flushAfterPaintEffects);
+}
+
+/* istanbul ignore else */
+if (typeof window !== 'undefined') {
+	afterPaint = (component) => {
+		if (!component._afterPaintQueued && (component._afterPaintQueued = true) && afterPaintEffects.push(component) === 1) {
+			/* istanbul ignore next */
+			if (options.requestAnimationFrame) {
+				options.requestAnimationFrame(flushAfterPaintEffects);
+			}
+			else {
+				requestAnimationFrame(scheduleFlushAfterPaint);
+			}
+		}
+	};
+}
+
+function handleEffects(effects) {
+    // 先清除
+    effects.forEach(invokeCleanup);
+    // 再执行本次
+	effects.forEach(invokeEffect);
+	return [];
+}
+
+/**
+ * 清除上次的 effect
+ */
+function invokeCleanup(hook) {
+	if (hook._cleanup) hook._cleanup();
+}
+
+/**
+ * 执行 effect
+ * @param hook effectHook
+ */
+function invokeEffect(hook) {
+    // 执行 effect
+    const result = hook._value();
+    // 返回的函数用于下一次的清除
+	if (typeof result === 'function') hook._cleanup = result;
+}
+
+// 依赖数组是否发生改变
+function argsChanged(oldArgs, newArgs) {
+	return !oldArgs || newArgs.some((arg, index) => arg !== oldArgs[index]);
+}
+
+// 如果 f 为函数 返回函数执行结果 否则返回函数
+function invokeOrReturn(arg, f) {
+	return typeof f === 'function' ? f(arg) : f;
+}
+```

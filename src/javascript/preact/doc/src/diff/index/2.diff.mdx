@@ -14,21 +14,17 @@ menu: diff/index.js
  * @param parentDom 父级 dom 节点
  * @param newVNode 新的 vnode
  * @param oldVNode 旧的 vnode
- * @param context current 对象
+ * @param context context 对象
  * @param isSvg 是否为 svg 元素
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
- * @param {Array<import('../internal').Component>} mounts A list of newly
- * mounted components
- * @param {import('../internal').Component | null} ancestorComponent The direct
- * parent component
- * @param {Element | Text} oldDom The current attached DOM
- * element any new dom elements should be placed around. Likely `null` on first
- * render (except when hydrating). Can be a sibling DOM element when diffing
- * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
+ * @param excessDomChildren diffChildren 参数
+ * @param mounts 新添加的节点数组
+ * @param ancestorComponent 当前比对的节点的父节点（vnode）
+ * @param force 组件立即更新
+ * @param oldDom diffChildren 参数
  */
 export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChildren, mounts, ancestorComponent, force, oldDom) {
-    // 新旧节点有一个为空，或者节点类型、key 不匹配时，删除整棵子树
 	if (oldVNode == null || newVNode == null || oldVNode.type !== newVNode.type || oldVNode.key !== newVNode.key) {
+		// 旧节点存在 说明新节点为空或者节点不匹配 删除整棵子树
 		if (oldVNode != null) unmount(oldVNode, ancestorComponent);
 		// 新的 vnode 为空 dom 也为 null
 		if (newVNode == null) return null;
@@ -39,8 +35,8 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
 	let c, tmp, isNew, oldProps, oldState, snapshot,
 		newType = newVNode.type, clearProcessingException;
 
-    // TODO: 避免 json 注入？ 啥意思
     // createElement 方法中已经将 constructor 置为 undefined
+	// 如果 newVNode.constructor 不是 undefined 说明 vnode 不是由 createElement 方法创建的, 是非法的
 	if (newVNode.constructor !== undefined) return null;
 
     // 调用 diff 钩子
@@ -50,8 +46,6 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
         // outer 一个 label 标记， 用于标识 break 位置
         // 新旧节点中有一个为 Fragment
 		outer: if (oldVNode.type === Fragment || newType === Fragment) {
-			// Passing the ancestorComponent instead of c here is needed for catchErrorInComponent
-			// to properly traverse upwards through fragments to find a parent Suspense
 			// 如果为 fragment 直接 diff children
 			diffChildren(parentDom, newVNode, oldVNode, context, isSvg, excessDomChildren, mounts, ancestorComponent, oldDom);
 
@@ -74,33 +68,39 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
 				}
 			}
 		}
+		// 组件类型
 		else if (typeof newType==='function') {
-
-			// Necessary for createContext api. Setting this property will pass
-			// the context value as `this.context` just for this component.
+			// 组件 context 实例
 			tmp = newType.contextType;
+			// context provider
 			let provider = tmp && context[tmp._id];
+			// context 值
 			let cctx = tmp ? (provider ? provider.props.value : tmp._defaultValue) : context;
 
-			// Get component and set it to `c`
+			// 将 _component 赋值给 c
+			// 之前渲染过
 			if (oldVNode._component) {
 				c = newVNode._component = oldVNode._component;
 				clearProcessingException = c._processingException = c._pendingError;
 				newVNode._dom = oldVNode._dom;
 			}
 			else {
-				// Instantiate the new component
+				// 建立组件实例
+				// class 类型
 				if (newType.prototype && newType.prototype.render) {
 					newVNode._component = c = new newType(newVNode.props, cctx); // eslint-disable-line new-cap
 				}
+				// function 类型
 				else {
 					newVNode._component = c = new Component(newVNode.props, cctx);
 					c.constructor = newType;
 					c.render = doRender;
 				}
 				c._ancestorComponent = ancestorComponent;
+				// 添加监听
 				if (provider) provider.sub(c);
 
+				// 添加初始化值
 				c.props = newVNode.props;
 				if (!c.state) c.state = {};
 				c.context = cctx;
@@ -111,24 +111,28 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
 
 			c._vnode = newVNode;
 
-			// Invoke getDerivedStateFromProps
 			if (c._nextState==null) {
 				c._nextState = c.state;
 			}
+			// 执行 getDerivedStateFromProps 生命周期 生成新的 state
 			if (newType.getDerivedStateFromProps!=null) {
 				assign(c._nextState==c.state ? (c._nextState = assign({}, c._nextState)) : c._nextState, newType.getDerivedStateFromProps(newVNode.props, c._nextState));
 			}
 
-			// Invoke pre-render lifecycle methods
+			// 新建的组件 
 			if (isNew) {
+				// componentWillMount 生命周期 废弃
 				if (newType.getDerivedStateFromProps==null && c.componentWillMount!=null) c.componentWillMount();
+				// 添加到 mounts 中，以便执行 componentDidMount 生命周期
 				if (c.componentDidMount!=null) mounts.push(c);
 			}
 			else {
+				// componentWillReceiveProps 废弃
 				if (newType.getDerivedStateFromProps==null && force==null && c.componentWillReceiveProps!=null) {
 					c.componentWillReceiveProps(newVNode.props, cctx);
 				}
 
+				// shouldComponentUpdate 生命周期
 				if (!force && c.shouldComponentUpdate!=null && c.shouldComponentUpdate(newVNode.props, c._nextState, cctx)===false) {
 					c.props = newVNode.props;
 					c.state = c._nextState;
@@ -137,6 +141,7 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
 					break outer;
 				}
 
+				// componentWillUpdate 生命周期
 				if (c.componentWillUpdate!=null) {
 					c.componentWillUpdate(newVNode.props, c._nextState, cctx);
 				}
@@ -185,9 +190,13 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
 				c.componentDidUpdate(oldProps, oldState, snapshot);
 			}
 		}
+		// 原生 html
 		else {
+			// diff 后的 dom 节点
 			newVNode._dom = diffElementNodes(oldVNode._dom, newVNode, oldVNode, context, isSvg, excessDomChildren, mounts, ancestorComponent);
 
+			// 1. 有 ref 引用
+			// 2. 引用更新
 			if ((tmp = newVNode.ref) && (oldVNode.ref !== tmp)) {
 				applyRef(tmp, newVNode._dom, ancestorComponent);
 			}
@@ -197,6 +206,7 @@ export function diff(parentDom, newVNode, oldVNode, context, isSvg, excessDomChi
 			c._pendingError = c._processingException = null;
 		}
 
+		// 调用钩子
 		if (tmp = options.diffed) tmp(newVNode);
 	}
 	catch (e) {

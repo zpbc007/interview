@@ -1,14 +1,15 @@
 ---
-name: 3.process
-menu: create-element.js
+name: 5.process
+menu: component.js
 ---
 
 ```js
 /** 清空渲染队列 */
 function process() {
     let p;
-    // 按深度排序 从内向外渲染
+    // 按深度排序 深度由浅到深
 	q.sort((a, b) => b._depth - a._depth);
+	// 从后向前遍历 先渲染深层节点
 	while ((p=q.pop())) {
 		// forceUpdate's callback argument is reused here to indicate a non-forced update.
 		if (p._dirty) p.forceUpdate(false);

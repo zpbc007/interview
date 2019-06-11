@@ -1,5 +1,5 @@
 ---
-name: 3.unmount
+name: 6.unmount
 menu: diff/index.js
 ---
 
@@ -23,7 +23,8 @@ export function unmount(vnode, ancestorComponent, skipRemove) {
 	let dom;
 	// 父节点没有被删除 且不是 Fragment
 	if (!skipRemove && vnode._lastDomChild == null) {
-		// 如果有 _dom 由于当前节点已经被删除 所以将 skipRemove = true
+		// vnode._dom 存在 当前节点已经被删除所以 skipRemove = true 
+		// vnode._dom 不存在 skipRemove = false
 		skipRemove = (dom = vnode._dom)!= null;
 	}
 
