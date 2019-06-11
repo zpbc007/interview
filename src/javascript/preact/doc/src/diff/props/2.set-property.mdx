@@ -1,0 +1,78 @@
+---
+name: 3.set-property
+menu: diff/props.js
+---
+
+```js
+/**
+ * 为 dom 节点设置参数
+ * @param dom dom 节点
+ * @param name 属性名
+ * @param value 属性值
+ * @param oldValue 旧的属性值
+ * @param isSvg 是否为 svg
+ */
+function setProperty(dom, name, value, oldValue, isSvg) {
+    // 普通 el 使用 className， svg 使用 class 
+	name = isSvg ? (name==='className' ? 'class' : name) : (name==='class' ? 'className' : name);
+
+    // 样式
+	if (name==='style') {
+        // 覆盖
+		const set = assign(assign({}, oldValue), value);
+		for (let i in set) {
+            // 略过没有变化的值
+			if ((value || EMPTY_OBJ)[i] === (oldValue || EMPTY_OBJ)[i]) {
+				continue;
+			}
+			dom.style.setProperty(
+				(i[0] === '-' && i[1] === '-') ? i : i.replace(CAMEL_REG, '-$&'),
+				(value && (i in value))
+					? (typeof set[i]==='number' && IS_NON_DIMENSIONAL.test(i)===false)
+						? set[i] + 'px'
+						: set[i]
+					: ''
+			);
+		}
+    }
+    // on-xxx 事件监听
+	// Benchmark for comparison: https://esbench.com/bench/574c954bdb965b9a00965ac6
+	else if (name[0]==='o' && name[1]==='n') {
+        // 是否为捕获阶段
+		let useCapture = name !== (name=name.replace(/Capture$/, ''));
+        let nameLower = name.toLowerCase();
+        // 事件名称
+		name = (nameLower in dom ? nameLower : name).slice(2);
+
+        // 添加 eventProxy 事件监听
+		if (value) {
+			if (!oldValue) dom.addEventListener(name, eventProxy, useCapture);
+        }
+        // 移除事件监听
+		else {
+			dom.removeEventListener(name, eventProxy, useCapture);
+		}
+		(dom._listeners || (dom._listeners = {}))[name] = value;
+    }
+    // 普通属性
+	else if (name!=='list' && name!=='tagName' && !isSvg && (name in dom)) {
+		dom[name] = value==null ? '' : value;
+	}
+	else if (typeof value!=='function' && name!=='dangerouslySetInnerHTML') {
+		if (name!==(name = name.replace(/^xlink:?/, ''))) {
+			if (value==null || value===false) {
+				dom.removeAttributeNS(XLINK_NS, name.toLowerCase());
+			}
+			else {
+				dom.setAttributeNS(XLINK_NS, name.toLowerCase(), value);
+			}
+		}
+		else if (value==null || value===false) {
+			dom.removeAttribute(name);
+		}
+		else {
+			dom.setAttribute(name, value);
+		}
+	}
+}
+```

@@ -1,0 +1,36 @@
+
+---
+name: 2.diff-props
+menu: diff/props.js
+---
+
+## 描述
+
+```js
+/**
+ * 比较新旧 props ，并将变化添加到 dom 节点上
+ * @param dom 设置参数的 dom 节点
+ * @param newProps 
+ * @param oldProps
+ * @param isSvg 是否为 svg
+ */
+export function diffProps(dom, newProps, oldProps, isSvg) {
+	let i;
+	
+	const keys = Object.keys(newProps).sort();
+	for (i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        // 新旧 props 不同
+		if (k!=='children' && k!=='key' && (!oldProps || ((k==='value' || k==='checked') ? dom : oldProps)[k]!==newProps[k])) {
+			setProperty(dom, k, newProps[k], oldProps[k], isSvg);
+		}
+	}
+
+    // 删除不存在的 props
+	for (i in oldProps) {
+		if (i!=='children' && i!=='key' && !(i in newProps)) {
+			setProperty(dom, i, null, oldProps[i], isSvg);
+		}
+	}
+}
+```

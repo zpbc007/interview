@@ -1,0 +1,19 @@
+---
+name: 4.event-proxy
+menu: diff/props.js
+---
+
+## 描述
+
+通过 event.type 来调用绑定在 dom 元素上的对应 listener。
+这样只有添加删除事件监听时需要在 dom 上处理，在更改事件监听函数时，只需在 _listeners 上处理即可。
+
+```js
+/**
+ * 事件代理处理函数
+ * @param e 原生 dom 事件
+ */
+function eventProxy(e) {
+	return this._listeners[e.type](options.event ? options.event(e) : e);
+}
+```
