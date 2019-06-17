@@ -94,7 +94,7 @@ flex-flow: <flex-direction> | <flex-wrap>;
 
 ```css
 .container {
-    align-center: flex-start | flex-end | center | space-between | space-around | stretch;
+    align-content: flex-start | flex-end | center | space-between | space-around | stretch;
 }
 ```
 
