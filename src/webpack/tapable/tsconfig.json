@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "module": "esnext",
+        "target": "es5",
+        "allowJs": false,
+        "lib": ["es7", "es2015", "esnext"],
+        "moduleResolution": "node",
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "baseUrl": ".",
+        "declaration": true,
+        "strictNullChecks": false,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
+    },
+    "exclude": [
+        "dist",
+        "log",
+        "node_modules",
+        "tmp"
+    ]
+}
